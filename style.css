@@ -3,22 +3,22 @@
     display: flex;
     gap: 10px;
     width: 100%;
-    height: 100vh; /* 填充整个视口 */
+    height: 100vh; 
 }
-/* 设置地图容器的大小 */
+/* Size of Map */
 #map {
     height: 100vh;
     width: 80%;
-    border: 2px solid #000; /* 可选：增加边框方便观察 */
-    order: 1; /* 保持地图在左侧 */
+    border: 2px solid #000; 
+    order: 1; /* ensure its position */
     position: relative;
 
-    /* 背景和边框 */
+    /* Background */
     background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 8px;
 
-    /* 阴影效果 */
+    /* Shadow */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
     display: inline-block;
@@ -43,7 +43,7 @@
     cursor: pointer;
     margin: 3px;
 }
-/* 按下时图标的缩放效果 */
+/* active function when clicking */
 .layer-icon:active {
     transform: scale(0.5);  /* 按下时略微缩小 */
 }
@@ -69,18 +69,17 @@
 #layerPanel input[type="checkbox"] {
     margin-right: 6px;
 }
-/* 当控制面板展开时的背景和边框 */
+/* background of layer control */
 .layer-control.open {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
 }
-/* 添加过渡效果 */
+/* Adding transition effect */
 .layer-control, #layerPanel {
     transition: all 0.3s ease;
 }
 
 /*Box*/
-/* 设置 box-sizing 以确保 padding 和 border 包含在宽度内 */
 #info, #pieChartWrapper {
     width: 20%;
     box-sizing: border-box;
@@ -118,7 +117,7 @@
     vertical-align: top;
 }
 
-/* 调整滚动条的样式 */
+/* Customize the scrollbar style */
 #info::-webkit-scrollbar {
     width: 8px;
 }
@@ -143,7 +142,7 @@
     max-width: 300px;
     max-height: 400px;
 }
-/* REQI 图例样式 */
+/* REQI Legend */
 .legend-reqi h3 {
     margin-top: 0;
     font-size: 16px;
@@ -163,7 +162,7 @@
 .legend-reqi div:last-child {
     margin-bottom: 0;
 }
-/* 热力图图例样式 */
+/* HeatMap Legend */
 
 .legend-color-bar {
     width: 20px;  /* 设置渐变条的宽度 */
@@ -203,7 +202,7 @@
 }
 
 
-/* 饼状图容器样式 */
+/* the style of PieChart */
 #pieChartWrapper {
     position: absolute;
     top: 72.5vh; /* 将饼图容器的上边界顶着 info 的下边界 */
@@ -244,7 +243,6 @@
     justify-content: center; /* 水平居中 */
 }
 
-/* 使用 Flexbox 居中按钮 */
 .button-container {
     display: flex;
     justify-content: center; /* 水平居中 */
@@ -252,7 +250,7 @@
     height: 100vh;           /* 设置容器高度为视口高度 */
 }
 
-/* 按钮样式 */
+/* Button */
 #resetButton {
     background-color: rgb(184, 184, 185); /* 蓝绿色背景 */
     color: white;              /* 白色字体 */
@@ -267,12 +265,9 @@
     top: 50px;          /* 距离顶部 60px */
     left: 8px;         /* 距离左侧 10px */
 }
-
-/* 鼠标悬停时的效果 */
 #resetButton:hover {
     background-color: rgb(142, 142, 142); /* 悬停时变暗的绿色 */
 }
-/* 点击时按钮的效果 */
 #resetButton:active {
     background-color: #2c3e50; /* 按下时变成更深的绿色 */
     transform: scale(0.98);     /* 按下时稍微缩小 */
