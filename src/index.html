@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Example</title>
+    <link rel="stylesheet" href="style.css"> <!-- 引用外联CSS文件 -->
+</head>
+<body>
+    <h1>Parks in Singapore</h1>
+    <!-- 容器 -->
+    <div id="container">
+        <!-- 地图容器 -->
+        <div id="map"></div>
+        <!-- 评论信息容器 -->
+        <div id="info">
+            <h2>Park Information</h2>
+            <hr>
+            <div id="parkDetails"></div>
+        </div>
+        <!-- PieChart容器 -->
+        <div id="pieChartWrapper">
+            <h2>Reviews Topic</h2>
+            <div id="pieChartContainer">
+                <canvas id="myPieChart"></canvas>
+                <button id="resetButton" style="margin-top: 10px;">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 Google Maps JavaScript API，替换 YOUR_API_KEY -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQUQ5Acb_bp52LX2tSs_P7FOH0nytrU6E&callback=initMap&language=en&libraries=visualization" async defer></script>
+    <!-- 加载数据 -->
+    <script src="demo.js"></script>
+    <!-- 加载动态饼状图 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 加载数据 -->
+    <script src="pieChart.js"></script>
+
+</body>
