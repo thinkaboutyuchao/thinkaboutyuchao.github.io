@@ -292,7 +292,7 @@ function toggleHeatmapR(isChecked) {
     if (isChecked) {
         if (!heatmapREQI) {
             // 如果热力图数据还没有加载，先加载
-            fetch('data/REQI_366Parks__FeaturesToJSO(1).geojson')
+            fetch('data/REQI_HeatMap.geojson')
                 .then(response => response.json())
                 .then(data => {
                     const heatmapData = data.features.map(feature => {
@@ -325,7 +325,7 @@ function toggleHeatmapS(isChecked) {
     if (isChecked) {
         if (!heatmapSS) {
             // 如果热力图数据还没有加载，先加载
-            fetch('data/Sentiment_JSON.geojson')
+            fetch('data/Sentiment_HeatMap.geojson')
                 .then(response => response.json())
                 .then(data => {
                     const heatmapData1 = data.features.map(feature => {
@@ -384,7 +384,7 @@ function toggleLayers(currentZoom) {
 // 加载CSV文件并显示对应公园信息
 function displayParkDetails(parkName) {
     // 加载第一个CSV文件
-    fetch('data/parks_ReqiSentiments_REV(1).csv')
+    fetch('data/parks_ReqiSentiments.csv')
         .then(response => response.text())
         .then(reqiText => {
             const reqiRows = reqiText.split('\n').map(row => row.split(','));
@@ -422,7 +422,7 @@ function displayParkDetails(parkName) {
             }
 
             // 加载第二个CSV文件
-            fetch('data/parks_reviews_sentiment.csv')
+            fetch('data/parks_reviews.csv')
                 .then(response => response.text())
                 .then(reviewText => {
                     const reviewRows = reviewText.split('\n').map(row => row.split(','));
