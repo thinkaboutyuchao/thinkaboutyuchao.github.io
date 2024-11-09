@@ -205,7 +205,7 @@
 /* the style of PieChart */
 #pieChartWrapper {
     position: absolute;
-    top: 68vh; /* 将饼图容器的上边界顶着 info 的下边界 */
+    top: 70vh; /* 将饼图容器的上边界顶着 info 的下边界 */
     height: 98%; /* 高度自动适应剩余空间 */
     width: 19.8%; /* 固定宽度以避免影响其他内容 */
     bottom: 0; /* 使容器的下边界与页面底部对齐 */
