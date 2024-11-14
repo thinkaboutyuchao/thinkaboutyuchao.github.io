@@ -429,24 +429,36 @@ function displayParkDetails(parkName) {
                     const reviewHeader = reviewRows[0];
                     const reviewNameIndex = reviewHeader.indexOf("place_name");
                     const reviewsIndex = reviewHeader.indexOf("review_text");
+                    const sentimentScoreIndex = reviewHeader.findIndex(column => column.trim() === "AdjustedSentimentScore");//get Sentiment
 
-                    // 筛选第二个CSV的数据
+                    // get the second csv data
                     const matchingReviewRows = reviewRows.slice(1).filter(row => row[reviewNameIndex] === parkName);
 
                     if (matchingReviewRows.length > 0) {
-                        // 显示所有的 review_text
+                        // show review_text
                         const reviewTextItem = document.createElement('p');
                         reviewTextItem.innerHTML = `<strong>Reviews:</strong>`;
                         matchingReviewRows.forEach(row => {
-                            // 根据 '|+' 分割评论并移除多余空白
+                            // split reviews and remove blank
                             const individualReviews = row[reviewsIndex].split('|+').map(r => r.trim()).filter(r => r);
                             individualReviews.forEach(individualReview => {
-                                // 去掉前后的引号，如果有的话
+                                // delete ""
                                 individualReview = individualReview.replace(/^"|"$/g, '').trim();
-                                // 确保只有非空评论被添加
+                                // get Sentiment Score
+                                const sentimentScore = row[sentimentScoreIndex] && !isNaN(parseFloat(row[sentimentScoreIndex]))? parseFloat(row[sentimentScoreIndex]).toFixed(2) : 0;
+                                //Sentiment label
+                                let sentimentLabel;
+                                if (sentimentScore < 4) {
+                                    sentimentLabel = "Negative";
+                                } else if (sentimentScore < 7) {
+                                    sentimentLabel = "Neutral";
+                                } else {
+                                    sentimentLabel = "Positive";
+                                }
+                                // make sure that it is valid
                                 if (individualReview) {
                                     const reviewParagraph = document.createElement('p');
-                                    reviewParagraph.textContent = individualReview; // 每条评论放在单独的段落中
+                                    reviewParagraph.textContent = `(${sentimentLabel}) (${sentimentScore}) ${individualReview}`; // make sure that every review has a paragraph
                                     reviewTextItem.appendChild(reviewParagraph);
                                 }
                             });
