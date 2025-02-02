@@ -425,51 +425,54 @@ function displayParkDetails(parkName) {
             fetch('data/parks_reviews.csv')
                 .then(response => response.text())
                 .then(reviewText => {
-                    const reviewRows = reviewText.split('\n').map(row => row.split(','));
-                    const reviewHeader = reviewRows[0];
+                    const reviewRows = reviewText.split('\n').map(row => {
+                        // 处理引号和逗号的问题
+                        const matches = row.match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g);
+                        return matches ? matches.map(m => m.replace(/^"|"$/g, '').trim()) : [];
+                    });
+                    
+                    const reviewHeader = reviewRows[0].map(header => header.trim());
                     const reviewNameIndex = reviewHeader.indexOf("place_name");
                     const reviewsIndex = reviewHeader.indexOf("review_text");
-                    const sentimentScoreIndex = reviewHeader.findIndex(column => column.trim() === "AdjustedSentimentScore");//get Sentiment
-
-                    // get the second csv data
-                    const matchingReviewRows = reviewRows.slice(1).filter(row => row[reviewNameIndex] === parkName);
-
-                    if (matchingReviewRows.length > 0) {
-                        // show review_text
-                        const reviewTextItem = document.createElement('p');
-                        reviewTextItem.innerHTML = `<strong>Reviews:</strong>`;
-                        matchingReviewRows.forEach(row => {
-                            // split reviews and remove blank
-                            const individualReviews = row[reviewsIndex].split('|+').map(r => r.trim()).filter(r => r);
-                            individualReviews.forEach(individualReview => {
-                                // delete ""
-                                individualReview = individualReview.replace(/^"|"$/g, '').trim();
-                                // get Sentiment Score
-                                const sentimentScore = row[sentimentScoreIndex] && !isNaN(parseFloat(row[sentimentScoreIndex]))? parseFloat(row[sentimentScoreIndex]).toFixed(2) : 0;
-                                //Sentiment label
-                                let sentimentLabel;
-                                if (sentimentScore < 4) {
-                                    sentimentLabel = "Negative";
-                                } else if (sentimentScore < 7) {
-                                    sentimentLabel = "Neutral";
-                                } else {
-                                    sentimentLabel = "Positive";
-                                }
-                                // make sure that it is valid
-                                if (individualReview) {
-                                    const reviewParagraph = document.createElement('p');
-                                    reviewParagraph.textContent = `(${sentimentLabel}) (${sentimentScore}) ${individualReview}`; // make sure that every review has a paragraph
-                                    reviewTextItem.appendChild(reviewParagraph);
-                                }
-                            });
-                        });
-                        parkDetailsContainer.appendChild(reviewTextItem);
-                    } else {
-                        const reviewTextItem = document.createElement('p');
-                        reviewTextItem.innerText = "No reviews available.";
-                        parkDetailsContainer.appendChild(reviewTextItem);
+                    const sentimentScoreIndex = reviewHeader.indexOf("SentimentScore");
+                    const adjustedLabelIndex = reviewHeader.indexOf("AdjustedLabel");
+                    
+                    if (reviewNameIndex === -1 || reviewsIndex === -1 || 
+                        sentimentScoreIndex === -1 || adjustedLabelIndex === -1) {
+                        console.error("CSV file is missing required columns.");
+                        return;
                     }
-                });
+                    
+                    // 获取特定公园的评论
+                    const matchingReviewRows = reviewRows.slice(1)
+                        .filter(row => row[reviewNameIndex]?.trim() === parkName);
+                    
+                    const reviewTextItem = document.createElement('div');
+                    reviewTextItem.innerHTML = `<strong>Reviews:</strong>`;
+                    
+                    if (matchingReviewRows.length > 0) {
+                        matchingReviewRows.forEach(row => {
+                            let sentimentScore = row[sentimentScoreIndex]?.trim();
+                            let sentimentLabel = row[adjustedLabelIndex]?.trim() || "Neutral";
+                            let review = row[reviewsIndex]?.trim();
+                            
+                            // 过滤异常格式评论
+                            if (review && !/^\(\d+\.?\d*\)$/.test(review) && 
+                                !/^\(\d+\.?\d*\) /.test(review) && !/\) \(/.test(review)) {
+                                const reviewParagraph = document.createElement('p');
+                                reviewParagraph.textContent = sentimentScore && !isNaN(parseFloat(sentimentScore))
+                                    ? `(${sentimentLabel}) (${parseFloat(sentimentScore).toFixed(2)}) ${review}`
+                                    : `(${sentimentLabel}) ${review}`;
+                                reviewTextItem.appendChild(reviewParagraph);
+                            }
+                        });
+                    } else {
+                        reviewTextItem.innerHTML += "<p>No reviews available.</p>";
+                    }
+                    
+                    parkDetailsContainer.appendChild(reviewTextItem);
+                })
+                .catch(error => console.error("Error fetching CSV file:", error));
         });
 }
 
