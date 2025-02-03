@@ -291,7 +291,6 @@ h1 {
 
     border-radius: 10px; /* 圆角 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-    text-transform: uppercase; /* 大写字母 */
     letter-spacing: 1px; /* 字母间距 */
 }
 h2 {

@@ -406,7 +406,7 @@ function displayParkDetails(parkName) {
                 parkDetailsContainer.appendChild(parkNameItem);
 
                 const ratingItem = document.createElement('p');
-                ratingItem.innerHTML = `<strong>Rating:</strong> ${matchingReqiRows[0][googleRatingIndex]}`;
+                ratingItem.innerHTML = `<strong>Google Review Rating:</strong> ${matchingReqiRows[0][googleRatingIndex]}`;
                 parkDetailsContainer.appendChild(ratingItem);
 
                 const reqiItem = document.createElement('p');
@@ -529,7 +529,7 @@ function addHeatmapLegend() {
     // 添加顶部标签
     const highLabel = document.createElement('div');
     highLabel.classList.add('legend-label', 'high-label');
-    highLabel.innerText = '10';
+    highLabel.innerText = 'High';
     legendHeatmap.appendChild(highLabel);
 
     // 添加渐变色条
@@ -540,7 +540,7 @@ function addHeatmapLegend() {
     // 添加底部标签
     const lowLabel = document.createElement('div');
     lowLabel.classList.add('legend-label', 'low-label');
-    lowLabel.innerText = '0';
+    lowLabel.innerText = 'Low';
     legendHeatmap.appendChild(lowLabel);
 
     // 将图例添加到地图的右上角
