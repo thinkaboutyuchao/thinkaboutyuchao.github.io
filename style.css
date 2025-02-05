@@ -129,18 +129,18 @@
     background-color: #555;
 }
 
+/* 通用图例样式 */
 .legend {
-    background-color:rgba(255, 255, 255, 0.8);
-    padding: 6px;
-    border: 1px solid #ccc;
-    position: absolute; /* 使用绝对定位 */
-    bottom: 5%;           /* 面板显示的位置 */
-    left: 6px;          /* 面板始终靠左显示 */
-    font-size: 14px;
-    line-height: 1.5;
-    z-index: 1;
-    max-width: 300px;
-    max-height: 400px;
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+    padding: 6px; /* 内边距 */
+    border: 1px solid #ccc; /* 边框 */
+    font-size: 14px; /* 字体大小 */
+    line-height: 1.5; /* 行高 */
+    position: absolute; /* 绝对定位 */
+    z-index: 1; /* 确保在其他元素上方 */
+    width: 150px; /* 固定宽度，避免自动拉伸 */
+    height: 175px;
+    bottom: 36px;
 }
 /* REQI Legend */
 .legend-reqi h3 {
@@ -150,20 +150,43 @@
 }
 .legend-reqi .legend-color {
     display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+    width: 20px;  /* 统一设置宽度 */
+    height: 20px; /* 统一设置高度 */
+    margin-right: 10px; /* 设置右边距，确保色块间有间距 */
 }
 .legend-reqi div {
     display: flex;
-    align-items: center;
-    margin-bottom: 5px;
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 5px; /* 每行之间的间距 */
 }
 .legend-reqi div:last-child {
-    margin-bottom: 0;
+    margin-bottom: 0; /* 最后一行不加下边距 */
 }
-/* HeatMap Legend */
 
+/* Sentiment Legend */
+.legend-sentiment h3 {
+    margin-top: 0;
+    font-size: 16px;
+    text-align: center;
+}
+.legend-sentiment .legend-color {
+    display: inline-block;
+    width: 20px;  /* 统一设置宽度 */
+    height: 20px; /* 统一设置高度 */
+    margin-right: 10px; /* 设置右边距，确保色块间有间距 */
+}
+.legend-sentiment div {
+    display: flex;
+    align-items: center; /* 垂直居中对齐 */
+    margin-bottom: 15px; /* 每行之间的间距 */
+}
+.legend-sentiment div:last-child {
+    margin-bottom: 0; /* 最后一行不加下边距 */
+}
+
+
+
+/* HeatMap Legend */
 .legend-color-bar {
     width: 20px;  /* 设置渐变条的宽度 */
     height: 200px; /* 设置渐变条的高度 */
@@ -298,3 +321,122 @@ h2 {
     padding: 0px; /* 设置较小的内边距 */
     margin-top: 12px;
 }
+
+/*时间滑块*/
+#slider {
+    position: absolute;
+    bottom: -70px;
+    left: 40%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 24px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1200;
+    width: 800px;
+}
+/* 标签样式 */
+.slider-label {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    padding: 4px 8px;
+}
+
+/* 第一个标签左对齐 */
+.first-label {
+    left: 0;
+    transform: translateX(0);
+}
+
+/* 最后一个标签右对齐 */
+.last-label {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+}
+
+.noUi-target {
+    width: 100%;
+    height: 6px;
+    border: none;
+    border-radius: 3px;
+    background: #e0e0e0;
+    box-shadow: none;
+}
+
+/*滑块样式*/
+/* 修改滑块手柄样式 */
+.noUi-handle {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important; /* 设置为圆形 */
+    background: #fff !important;
+    border: 2px solid #fff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+    cursor: pointer;
+    right: -8px !important; /* 调整位置，使其居中 */
+    top: -px !important;
+    display: block !important; /* 之前我们把它隐藏了，现在显示出来 */
+}
+/* 移除滑块手柄的默认线条 */
+.noUi-handle:before,
+.noUi-handle:after {
+    display: none !important;
+}
+
+.noUi-connect {
+    background: #4a90e2;
+}
+
+/* 节点样式 */
+.slider-point {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 2px solid #979797;
+    border-radius: 50%;
+    top: 0px;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+/* 活跃节点样式 */
+.slider-point.active {
+    background: #65c2b1;
+    border-color: #65c2b1;
+}
+/* 连接线样式 */
+.point-connector {
+    position: absolute;
+    width: 20%;
+    height: 8px;
+    background: #d6d5d5;
+    top: 4px;
+    z-index: 1;
+}
+/* 确保节点在连接线上层 */
+.slider-point {
+    z-index: 2;
+}
+
+/* 标签样式 */
+.slider-label {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+}
+/* 连接线样式 */
+.noUi-connects {
+    border-radius: 3px;
+    z-index: 1;
+}
+
