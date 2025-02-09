@@ -721,6 +721,7 @@ function displayParkDetails(parkName) {
             })
             .catch(error => console.error("Error fetching CSV file:", error));
         });
+
 }
 
 // 更新 Sentiment 数据的函数
@@ -756,76 +757,144 @@ function updateSentimentData(selectedYear) {
     }
 }
 
-
-// 添加更新评论的函数
+//显示评论函数
+// Function to create and style the filter container
+function createFilterContainer() {
+    const filterContainer = document.createElement('div');
+    filterContainer.id = 'filterContainer';
+    filterContainer.style.display = 'flex';
+    filterContainer.style.alignItems = 'center';
+    filterContainer.style.gap = '10px';
+    filterContainer.style.marginBottom = '10px';
+    return filterContainer;
+}
+// Updated displayReviews function with fixed dropdown positioning and time filter logic
 function displayReviews(selectedYear) {
     const parkDetails = document.getElementById('parkDetails');
     if (!parkDetails || !window.reviewData) return;
 
-    // 移除现有的评论部分
-    const existingReviews = parkDetails.querySelectorAll('.reviews-section');
-    existingReviews.forEach(section => section.remove());
-
-    const reviewSection = document.createElement('div');
-    reviewSection.className = 'reviews-section';
-    reviewSection.innerHTML = `<strong>Reviews:</strong>`;
-
-    const { matchingReviews, indices } = window.reviewData;
-    
-    if (matchingReviews.length > 0) {
-        matchingReviews.forEach(row => {
-            let sentimentScore = row[indices.sentimentScore]?.trim();
-            let sentimentLabel = row[indices.adjustedLabel]?.trim() || "Neutral";
-            let review = row[indices.reviews]?.trim();
-            let publishedDate = row[indices.publishedDate]?.trim();
-
-            // 修改年份筛选逻辑
-            const reviewYear = new Date(publishedDate).getFullYear();
-            let showReview = false;
-
-            switch(selectedYear) {
-                case 0: // Pre-2020
-                    showReview = reviewYear < 2020;
-                    break;
-                case 1: // 2020
-                    showReview = reviewYear === 2020;
-                    break;
-                case 2: // 2021
-                    showReview = reviewYear === 2021;
-                    break;
-                case 3: // 2022
-                    showReview = reviewYear === 2022;
-                    break;
-                case 4: // 2023
-                    showReview = reviewYear === 2023;
-                    break;
-                case 5: // 2024
-                    showReview = reviewYear === 2024;
-                    break;
-            }
-
-            if (showReview) {
-                // 过滤异常格式评论
-                if (review && !/^\(\d+\.?\d*\)$/.test(review) &&
-                    !/^\(\d+\.?\d*\) /.test(review) && !/\) \(/.test(review)) {
-                    const reviewParagraph = document.createElement('p');
-                    reviewParagraph.textContent = sentimentScore && !isNaN(parseFloat(sentimentScore))
-                        ? `(${sentimentLabel}) (${parseFloat(sentimentScore).toFixed(2)}) ${review}`
-                        : `(${sentimentLabel}) ${review}`;
-                    reviewSection.appendChild(reviewParagraph);
-                }
-            }
-        });
-
-        // 如果该年份没有评论，显示提示信息
-        if (!reviewSection.querySelectorAll('p').length) {
-            reviewSection.innerHTML += `<p>No reviews available for ${timeLabels[selectedYear]}.</p>`;
-        }
-    } else {
-        reviewSection.innerHTML += "<p>No reviews available.</p>";
+    // Create or get filter container with flex layout
+    let filterContainer = document.getElementById('filterContainer');
+    if (!filterContainer) {
+        filterContainer = createFilterContainer();
+        parkDetails.appendChild(filterContainer);
     }
 
-    parkDetails.appendChild(reviewSection);
+    // Create or get the reviews title
+    let reviewTitle = document.getElementById('reviewTitle');
+    if (!reviewTitle) {
+        reviewTitle = document.createElement('strong');
+        reviewTitle.id = 'reviewTitle';
+        reviewTitle.textContent = "Reviews:";
+        filterContainer.appendChild(reviewTitle);
+    }
+
+    // Create or get sentiment filter
+    let sentimentFilter = document.getElementById('sentimentFilter');
+    if (!sentimentFilter) {
+        sentimentFilter = document.createElement('select');
+        sentimentFilter.id = 'sentimentFilter';
+        
+        // Add options
+        const options = ["All", "Positive", "Neutral", "Negative"];
+        options.forEach(option => {
+            const optElement = document.createElement('option');
+            optElement.value = option.toLowerCase();
+            optElement.textContent = option;
+            sentimentFilter.appendChild(optElement);
+        });
+
+        // Add change event listener
+        sentimentFilter.addEventListener('change', () => {
+            const currentYear = Math.round(parseFloat(slider.noUiSlider.get()));
+            displayFilteredReviews(currentYear, sentimentFilter.value);
+        });
+        
+        filterContainer.appendChild(sentimentFilter);
+    }
+
+    // Create or get review section
+    let reviewSection = document.getElementById('reviewSection');
+    if (!reviewSection) {
+        reviewSection = document.createElement('div');
+        reviewSection.id = 'reviewSection';
+        reviewSection.className = 'reviews-section';
+        parkDetails.appendChild(reviewSection);
+    }
+
+    // Display initial reviews
+    displayFilteredReviews(selectedYear, sentimentFilter.value);
+}
+// Separate function to handle review filtering and display
+function displayFilteredReviews(selectedYear, selectedFilter) {
+    const reviewSection = document.getElementById('reviewSection');
+    reviewSection.innerHTML = '';
+
+    const { matchingReviews, indices } = window.reviewData;
+    if (!matchingReviews || matchingReviews.length === 0) {
+        reviewSection.innerHTML = "<p>No reviews available.</p>";
+        return;
+    }
+
+    // 过滤评论
+    const filteredReviews = matchingReviews.filter(row => {
+        const publishedDate = row[indices.publishedDate]?.trim();
+        const reviewYear = new Date(publishedDate).getFullYear();
+        const sentimentLabelRaw = row[indices.adjustedLabel]?.trim() || "Neutral";
+        // 使用 normalizeSentiment 对情感标签进行标准化
+        const normalizedSentiment = normalizeSentiment(sentimentLabelRaw);
+
+        // 年份过滤逻辑
+        let matchesYear = false;
+        switch(selectedYear) {
+            case 0: matchesYear = reviewYear < 2020; break;
+            case 1: matchesYear = reviewYear === 2020; break;
+            case 2: matchesYear = reviewYear === 2021; break;
+            case 3: matchesYear = reviewYear === 2022; break;
+            case 4: matchesYear = reviewYear === 2023; break;
+            case 5: matchesYear = reviewYear === 2024; break;
+        }
+
+        // 情感过滤逻辑
+        const matchesSentiment = selectedFilter === "all" ||
+                                normalizedSentiment === selectedFilter;
+
+        return matchesYear && matchesSentiment;
+    });
+
+    if (filteredReviews.length === 0) {
+        reviewSection.innerHTML = `<p>No reviews available for ${timeLabels[selectedYear]} with filter "${selectedFilter}".</p>`;
+        return;
+    }
+
+    // 显示过滤后的评论
+    filteredReviews.forEach(row => {
+        const sentimentScore = row[indices.sentimentScore]?.trim();
+        const sentimentLabel = row[indices.adjustedLabel]?.trim() || "Neutral";
+        const review = row[indices.reviews]?.trim();
+
+        const reviewParagraph = document.createElement('p');
+        reviewParagraph.textContent = sentimentScore && !isNaN(parseFloat(sentimentScore))
+            ? `(${sentimentLabel}) (${parseFloat(sentimentScore).toFixed(2)}) ${review}`
+            : `(${sentimentLabel}) ${review}`;
+        reviewSection.appendChild(reviewParagraph);
+    });
+}
+//辅助函数，进行情感标签映射
+function normalizeSentiment(sentiment) {
+    const s = sentiment.toLowerCase();
+    if (s === 'pos') return 'positive';
+    if (s === 'neu') return 'neutral';
+    if (s === 'neg') return 'negative';
+    return s;
+}
+
+
+// 绑定下拉框的更新函数：直接读取 slider 的值
+function updateReviewDisplay() {
+    // 从 noUiSlider 获取当前选中的年份索引（0~5）
+    const selectedYear = Math.round(parseFloat(slider.noUiSlider.get()));
+    displayReviews(selectedYear);
 }
 
 

@@ -129,6 +129,26 @@
     background-color: #555;
 }
 
+#filterContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#sentimentFilter {
+    width: 150px;
+    margin-left: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.reviews-section {
+    margin-top: 10px;
+}
+
+
 /* 通用图例样式 */
 .legend {
     background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
@@ -440,4 +460,7 @@ h2 {
     border-radius: 3px;
     z-index: 1;
 }
+
+
+
 
