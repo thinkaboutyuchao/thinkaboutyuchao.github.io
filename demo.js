@@ -108,6 +108,7 @@ let sentimentPolygonLayer = [];
 // 全局声明热力图变量
 let heatmapREQI;
 let heatmapSS;
+let heatmapPointsLayer;  // 点图层的热力图层变量
 //heatmap color
 const gradientHeat = [
     'rgba(0, 255, 255, 0)', 'rgba(0, 255, 255, 1)', 'rgba(0, 191, 255, 1)', 
@@ -214,10 +215,11 @@ function initMap() {
         <img src="images/Layer.jpg" class="layer-icon" id="layerManager" title="Layer Manager" onclick="togglePointLayer()">
         <div id="layerPanel" style="display: none;">
             <label><input type="checkbox" onchange="toggleLayer('points', this.checked)" checked> Points</label><br>
-            <label><input type="checkbox" id="PolyToggle" onchange="toggleLayer('polygons', this.checked)" checked>ReqiPoly</label><br>
-            <label><input type="checkbox" id="SentimentPolyToggle" onchange="toggleLayer('sentiment', this.checked)">SentPoly</label><br>
-            <label><input type="checkbox" id="heatmapToggle" onchange="toggleHeatmap('REQI',this.checked)"> REQI</label><br>
-            <label><input type="checkbox" id="heatmapToggle1" onchange="toggleHeatmap('Sentiment',this.checked)"> Sentiment</label><br>
+            <label><input type="checkbox" id="PolyToggle" onchange="toggleLayer('polygons', this.checked)" checked>REQI Polygons</label><br>
+            <label><input type="checkbox" id="SentimentPolyToggle" onchange="toggleLayer('sentiment', this.checked)">Sentiment Polygons</label><br>
+            <label><input type="checkbox" id="heatmapTogglePoints" onchange="toggleHeatmap('Points',this.checked)"> HeatMap</label><br>
+            <label><input type="checkbox" id="heatmapToggle" onchange="toggleHeatmap('REQI',this.checked)"> REQI HeatMap</label><br>
+            <label><input type="checkbox" id="heatmapToggle1" onchange="toggleHeatmap('Sentiment',this.checked)"> Sentiment HeatMap</label><br>
         </div>
     `;
     // map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(layerControl);
@@ -233,6 +235,8 @@ function initMap() {
     addREQILegend();
     // 添加Semtiment图例
     addSentimentLegend()
+    // 添加热力图图例
+    addHeatmapLegend()
     //给图层添加点击事件
     const togglePoints = document.getElementById('layerManager');
     togglePoints.addEventListener('click', toggleLayerControl);
@@ -436,12 +440,12 @@ function toggleSentimentPolygons(isChecked) {
 // 获取 Sentiment 多边形颜色
 function getSentimentColor(sentiment) {
     const sentimentValue = parseFloat(sentiment);
-    if (sentimentValue === -999) return '#F08080'; // 无数据时显示灰色
+    if (sentimentValue === -999) return '#FF6B6B'; // 无数据
     
-    return sentimentValue > 7 ? '#8B0000' :  // 最高情感分数：深红
-           sentimentValue > 4 ? '#B22222' :  // 较高情感分数：火砖红
-           sentimentValue > 0 ? '#DC143C' :  // 中等情感分数：胭脂红
-                                  '#F08080';   // 较低情感分数：浅红
+    return sentimentValue > 7 ? '#7B0000' :  // 最高情感分数：深红
+           sentimentValue > 4 ? '#A40000' :  // 较高情感分数：火砖红
+           sentimentValue > 0 ? '#D32F2F' :  // 中等情感分数：胭脂红
+                                  '#FF6B6B';   // 较低情感分数：浅红
 }
 // 创建并绘制情感多边形的函数
 function createSentimentPolygon(coordinates, feature) {
@@ -482,16 +486,18 @@ function updateSentimentPolygons(selectedIndex) {
     });
 }
 
-
+// 控制热力图显示或隐藏
 function toggleHeatmap(layerType, isChecked){
     if (layerType === 'REQI') {
         toggleHeatmapR(isChecked);
     }else if(layerType === 'Sentiment'){
         toggleHeatmapS(isChecked);
-    }
+    }else if(layerType === 'Points'){
+        toggleHeatmapPoints(isChecked);
+    };
     toggleHeatmapLegend();
 };
-// 控制热力图显示或隐藏
+// 加载热力图函数
 function toggleHeatmapR(isChecked) {
     if (isChecked) {
         if (!heatmapREQI) {
@@ -558,6 +564,40 @@ function toggleHeatmapS(isChecked) {
         }
     }
 }
+function toggleHeatmapPoints(isChecked) {
+    if (isChecked) {
+        if (!heatmapPointsLayer) {
+            // 加载 GeoJSON 数据
+            fetch('data/REQI_HeatMap.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    // 仅提取坐标，不加权重
+                    const heatmapData = data.features.map(feature => {
+                        const coords = feature.geometry.coordinates;
+                        return new google.maps.LatLng(coords[1], coords[0]);  // 仅坐标，无权重
+                    });
+
+                    // 创建新的热力图层
+                    heatmapPointsLayer = new google.maps.visualization.HeatmapLayer({
+                        data: heatmapData,
+                        map: map,  // 显示在地图上
+                        radius: 20,  // 半径
+                        gradient: gradientHeat,  // 颜色渐变
+                        zIndex: 15  // 确保不会覆盖其他图层
+                    });
+                })
+                .catch(error => console.error('Error loading heatmap points:', error));
+        } else {
+            heatmapPointsLayer.setMap(map);  // 显示热力图
+            heatmapPointsLayer.setOptions({ zIndex: 15 });
+        }
+    } else {
+        if (heatmapPointsLayer) {
+            heatmapPointsLayer.setMap(null);  // 隐藏热力图
+        }
+    }
+}
+
 
 //缩放图层控制
 function toggleLayers(currentZoom) {
@@ -596,6 +636,8 @@ function displayParkDetails(parkName) {
             const nameIndex = globalReqiHeader.indexOf("name_1");
             const googleRatingIndex = globalReqiHeader.indexOf("Google Rating");
             const reqiHaveLSTIndex = globalReqiHeader.indexOf("REQI_haveLST");
+            const sentiment2024Index = globalReqiHeader.indexOf("Sentiment 2024"); // **新增 Sentiment 2024 索引**
+
 
             // 筛选数据并保存到全局变量
             globalMatchingReqiRows = reqiRows.slice(1).filter(row => row[nameIndex] === parkName);
@@ -626,6 +668,11 @@ function displayParkDetails(parkName) {
                 const shortLabel = sentimentColumn.replace('Sentiment ', '');
                 sentimentScoreItem.innerHTML = `<strong>Sentiment Score (${shortLabel}):</strong> ${globalMatchingReqiRows[0][sentimentScoreIndex] || "N/A"}`;
                 parkDetailsContainer.appendChild(sentimentScoreItem);
+
+                //Sentiment 2024行
+                const sentiment2024Item = document.createElement('p');
+                sentiment2024Item.innerHTML = `<strong>Current Sentiment Score:</strong> ${globalMatchingReqiRows[0][sentiment2024Index] || "N/A"}`;
+                parkDetailsContainer.appendChild(sentiment2024Item);
             } else {
                 parkDetailsContainer.innerText = "No REQI information available.";
                 return;
@@ -812,7 +859,7 @@ function toggleHeatmapLegend() {
     const legend = document.getElementById('heatmapLegend');
     
     // 检查热力图复选框的状态
-    const heatmapChecked = document.getElementById('heatmapToggle').checked || document.getElementById('heatmapToggle1').checked;
+    const heatmapChecked = document.getElementById('heatmapToggle').checked || document.getElementById('heatmapToggle1').checked ||document.getElementById('heatmapTogglePoints').checked;
 
     // 如果任一热力图复选框被选中，显示图例；否则隐藏
     legend.style.display = heatmapChecked ? 'block' : 'none';   
@@ -847,10 +894,10 @@ function addSentimentLegend() {
 
     const legendContent = `
         <h3>Sentiment Index</h3>
-        <div><div class="legend-color" style="background: #8B0000;"></div> >=7 </div>
-        <div><div class="legend-color" style="background: #B22222;"></div> 4 - 7 </div>
-        <div><div class="legend-color" style="background: #DC143C;"></div> 0 - 4 </div>
-        <div><div class="legend-color" style="background: #F08080;"></div> ==0 </div>
+        <div><div class="legend-color" style="background: #7B0000;"></div> >=7 </div>
+        <div><div class="legend-color" style="background: #A40000;"></div> 4 - 7 </div>
+        <div><div class="legend-color" style="background: #D32F2F;"></div> 0 - 4 </div>
+        <div><div class="legend-color" style="background: #FF6B6B;"></div> ==0 </div>
     `;
     legendSentiment.innerHTML = legendContent;
     document.getElementById('map').appendChild(legendSentiment);

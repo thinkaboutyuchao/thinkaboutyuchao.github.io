@@ -54,7 +54,7 @@
     position: absolute; /* 使用绝对定位 */
     top: 50px;           /* 面板显示的位置 */
     right: 0;            /* 面板始终靠右显示 */
-    width: 100px;
+    width: 160px;
     display: none;       /* 初始时隐藏面板 */
 }
 #layerPanel label {
@@ -188,8 +188,8 @@
 
 /* HeatMap Legend */
 .legend-color-bar {
-    width: 20px;  /* 设置渐变条的宽度 */
-    height: 200px; /* 设置渐变条的高度 */
+    width: 30px;  /* 设置渐变条的宽度 */
+    height: 120px; /* 设置渐变条的高度 */
     background: linear-gradient(to top, 
     rgba(0, 255, 255, 0), 
     rgba(0, 255, 255, 1), 
@@ -208,7 +208,8 @@
     ); /* 使用线性渐变展示颜色过渡 */
 
     border: 1px solid black; /* 边框让渐变条更显眼 */
-    margin-bottom: 10px; /* 给渐变条添加一点底部间距 */
+    margin-bottom: 5px; /* 给渐变条添加一点底部间距 */
+    margin: 0 auto 10px;  /* 上边距 0，左右自动居中，下边距 10px */
 }
 .legend-labels {
     display: flex;
