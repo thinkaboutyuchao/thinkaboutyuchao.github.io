@@ -218,8 +218,6 @@ function initMap() {
             <label><input type="checkbox" id="PolyToggle" onchange="toggleLayer('polygons', this.checked)" checked>REQI Polygons</label><br>
             <label><input type="checkbox" id="SentimentPolyToggle" onchange="toggleLayer('sentiment', this.checked)">Sentiment Polygons</label><br>
             <label><input type="checkbox" id="heatmapTogglePoints" onchange="toggleHeatmap('Points',this.checked)"> HeatMap</label><br>
-            <label><input type="checkbox" id="heatmapToggle" onchange="toggleHeatmap('REQI',this.checked)"> REQI HeatMap</label><br>
-            <label><input type="checkbox" id="heatmapToggle1" onchange="toggleHeatmap('Sentiment',this.checked)"> Sentiment HeatMap</label><br>
         </div>
     `;
     // map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(layerControl);
@@ -497,7 +495,7 @@ function toggleHeatmap(layerType, isChecked){
     };
     toggleHeatmapLegend();
 };
-// 加载热力图函数
+/* 加载热力图函数
 function toggleHeatmapR(isChecked) {
     if (isChecked) {
         if (!heatmapREQI) {
@@ -563,7 +561,7 @@ function toggleHeatmapS(isChecked) {
             heatmapSS.setMap(null);  // 隐藏热力图
         }
     }
-}
+}*/
 function toggleHeatmapPoints(isChecked) {
     if (isChecked) {
         if (!heatmapPointsLayer) {
@@ -859,7 +857,7 @@ function toggleHeatmapLegend() {
     const legend = document.getElementById('heatmapLegend');
     
     // 检查热力图复选框的状态
-    const heatmapChecked = document.getElementById('heatmapToggle').checked || document.getElementById('heatmapToggle1').checked ||document.getElementById('heatmapTogglePoints').checked;
+    const heatmapChecked = document.getElementById('heatmapTogglePoints').checked;
 
     // 如果任一热力图复选框被选中，显示图例；否则隐藏
     legend.style.display = heatmapChecked ? 'block' : 'none';   
